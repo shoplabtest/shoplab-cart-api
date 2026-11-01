@@ -129,3 +129,10 @@ test('checkout needs a login and a non-empty cart', async () => {
   assert.equal((await call('/cart/checkout', { method: 'POST' })).status, 401);
   assert.equal((await call('/cart/checkout', { method: 'POST', token: userToken(USER) })).status, 409);
 });
+
+test('add accepts a numeric string quantity but still rejects other strings', async () => {
+  const ok = await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: '2' } });
+  assert.equal(ok.status, 200);
+  assert.equal((await json(ok)).lines[0].quantity, 2);
+  assert.equal((await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: 'two' } })).status, 400);
+});
