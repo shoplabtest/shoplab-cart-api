@@ -76,11 +76,11 @@ test('quantity edit, remove, and quantity 0 removes the line', async () => {
 
 test('coupon: percent off the subtotal; invalid and expired codes are 422', async () => {
   const a = await json(await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: 3 } }));
-  const c = await json(await call('/cart/coupon', { method: 'POST', body: { code: 'ten' }, cartId: a.id }));
+  const c = await json(await call('/cart/coupon', { method: 'POST', body: { couponCode: 'ten' }, cartId: a.id }));
   assert.equal(c.coupon, 'TEN');
   assert.equal(c.total, 2700);
-  assert.equal((await call('/cart/coupon', { method: 'POST', body: { code: 'NOPE' }, cartId: a.id })).status, 422);
-  assert.equal((await call('/cart/coupon', { method: 'POST', body: { code: 'OLD' }, cartId: a.id })).status, 422);
+  assert.equal((await call('/cart/coupon', { method: 'POST', body: { couponCode: 'NOPE' }, cartId: a.id })).status, 422);
+  assert.equal((await call('/cart/coupon', { method: 'POST', body: { couponCode: 'OLD' }, cartId: a.id })).status, 422);
 });
 
 test('login merge: guest lines add into the user cart and the guest cart is gone', async () => {
@@ -88,7 +88,7 @@ test('login merge: guest lines add into the user cart and the guest cart is gone
   await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: 1 }, token });
   const guest = await json(await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: 2 } }));
   await call('/cart/items', { method: 'POST', body: { productId: 'p-2', quantity: 1 }, cartId: guest.id });
-  await call('/cart/coupon', { method: 'POST', body: { code: 'TEN' }, cartId: guest.id });
+  await call('/cart/coupon', { method: 'POST', body: { couponCode: 'TEN' }, cartId: guest.id });
 
   const merged = await json(await call('/cart/merge', { method: 'POST', body: { guestCartId: guest.id }, token }));
   assert.deepEqual(merged.lines.map((l) => [l.productId, l.quantity]), [['p-1', 3], ['p-2', 1]]);
@@ -115,7 +115,7 @@ test('an expired cart is replaced by a fresh empty one', async () => {
 test('checkout publishes cart.checked_out matching the contract and closes the cart', async () => {
   const token = userToken(USER);
   await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: 2 }, token });
-  await call('/cart/coupon', { method: 'POST', body: { code: 'TEN' }, token });
+  await call('/cart/coupon', { method: 'POST', body: { couponCode: 'TEN' }, token });
   const r = await call('/cart/checkout', { method: 'POST', token });
   assert.equal(r.status, 202);
   const ev = events.published.at(-1)!;
