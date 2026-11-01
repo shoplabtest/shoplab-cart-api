@@ -67,6 +67,12 @@ export function createApp({ cfg, store, events, catalog }: Deps) {
 
   app.get('/cart', async (req, res) => send(res, (await resolveCart(req)).cart));
 
+  app.get('/cart/count', async (req, res) => {
+    const { cart } = await resolveCart(req);
+    const lines = await store.getLines(cart.id);
+    res.json({ count: lines.reduce((n, l) => n + l.quantity, 0) });
+  });
+
   app.post('/cart/items', async (req, res) => {
     const { productId, quantity } = req.body ?? {};
     if (typeof productId !== 'string' || !Number.isInteger(quantity) || quantity < 1) return void res.status(400).json({ error: 'invalid_request' });
