@@ -41,13 +41,13 @@ export function createApp({ cfg, store, events, catalog }: Deps) {
     try { return jwt.verify(h.slice(7), cfg.jwtSecret) as Claims; } catch { return null; }
   };
 
-  /** Resolves the caller's cart: a user's active cart, or a guest cart named by `x-cart-id`. Expired carts are replaced. */
+  /** Resolves the caller's cart: a user's active cart, or a guest cart named by `x-guest-cart-id`. Expired carts are replaced. */
   const resolveCart = async (req: Request): Promise<{ cart: CartRow; claims: Claims | null }> => {
     const claims = claimsOf(req);
     let cart: CartRow | null = null;
     if (claims) cart = await store.findActiveUserCart(claims.sub);
     else {
-      const id = req.header('x-cart-id');
+      const id = req.header('x-guest-cart-id');
       const found = id ? await store.findCart(id).catch(() => null) : null;
       if (found && found.user_id === null && found.status === 'active') cart = found;
     }

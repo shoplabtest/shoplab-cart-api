@@ -31,7 +31,7 @@ export function start(store: Store, catalog: CatalogClient) {
       headers: {
         'content-type': 'application/json',
         ...(o.token ? { authorization: `Bearer ${o.token}` } : {}),
-        ...(o.cartId ? { 'x-cart-id': o.cartId } : {}),
+        ...(o.cartId ? { 'x-guest-cart-id': o.cartId } : {}),
       },
       body: o.body ? JSON.stringify(o.body) : undefined,
     });
