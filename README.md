@@ -4,7 +4,7 @@ Carts, coupons and price snapshots. Express + Postgres.
 
 | Endpoint | Notes |
 | --- | --- |
-| `GET /cart` | user cart (Bearer JWT from iam) or guest cart named by the `x-cart-id` header |
+| `GET /cart` | user cart (Bearer JWT from iam) or guest cart named by the `x-guest-cart-id` header |
 | `POST /cart/items` | looks the product up with `GET {CATALOG_API_URL}/products/:id` and snapshots the price |
 | `PATCH/DELETE /cart/items/:productId` | quantity `0` removes the line |
 | `POST /cart/coupon` | percent off the subtotal; unknown or expired code is 422 |
