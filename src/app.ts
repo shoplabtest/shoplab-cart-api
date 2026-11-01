@@ -99,7 +99,7 @@ export function createApp({ cfg, store, events, catalog }: Deps) {
   });
 
   app.post('/cart/coupon', async (req, res) => {
-    const code = req.body?.code;
+    const code = req.body?.couponCode;
     const coupon = typeof code === 'string' ? await store.getCoupon(code.toUpperCase()) : null;
     if (!coupon || (coupon.expires_at && coupon.expires_at <= new Date())) return void res.status(422).json({ error: 'invalid_coupon' });
     const { cart } = await resolveCart(req);
