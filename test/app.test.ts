@@ -129,3 +129,11 @@ test('checkout needs a login and a non-empty cart', async () => {
   assert.equal((await call('/cart/checkout', { method: 'POST' })).status, 401);
   assert.equal((await call('/cart/checkout', { method: 'POST', token: userToken(USER) })).status, 409);
 });
+
+test('GET /cart/count sums quantities and is 0 for an empty cart', async () => {
+  const empty = await call('/cart/count');
+  assert.deepEqual(await empty.json(), { count: 0 });
+  const first = await json(await call('/cart/items', { method: 'POST', body: { productId: 'p-1', quantity: 2 } }));
+  await call('/cart/items', { method: 'POST', body: { productId: 'p-2', quantity: 3 }, cartId: first.id });
+  assert.deepEqual(await (await call('/cart/count', { cartId: first.id })).json(), { count: 5 });
+});
